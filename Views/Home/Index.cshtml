@@ -1,0 +1,128 @@
+﻿@model BookApplication.Models.ViewModels.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home";
+}
+
+<h2>Add Book</h2>
+
+<form method="post" action="/Home/AddBook">
+
+    <div class="mb-2">
+        <label>Title</label>
+        <input type="text"
+               name="Title"
+               class="form-control" required />
+    </div>
+
+    <div class="mb-2">
+        <label>Price</label>
+        <input type="number"
+               name="Price"
+               class="form-control"
+               step="0.01" />
+    </div>
+
+    <div class="mb-2">
+        <label>Author</label>
+
+        <select name="AuthorId" class="form-control">
+            @foreach (var author in Model.Authors)
+            {
+                <option value="@author.Id">
+                    @author.Name
+                </option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">
+        Add Book
+    </button>
+
+</form>
+
+<hr />
+
+<h2>Add Author</h2>
+
+<form method="post" action="/Home/AddAuthor">
+
+    <div class="mb-2">
+        <label>Name</label>
+        <input type="text"
+               name="Name"
+               class="form-control" required />
+    </div>
+
+    <div class="mb-2">
+        <label>Country</label>
+        <input type="text"
+               name="Country"
+               class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Add Author
+    </button>
+
+</form>
+
+<hr />
+
+<h2>Books List</h2>
+
+@if (Model.Books.Count == 0)
+{
+    <p>No books available</p>
+}
+else
+{
+    <div class="row">
+        @foreach (var book in Model.Books)
+        {
+            var author = Model.Authors
+                              .FirstOrDefault(a => a.Id == book.AuthorId);
+
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+                        <p class="card-text">
+                            <strong>Author:</strong> @(author?.Name ?? "Unknown")
+                        </p>
+                        <p class="card-text">
+                            <strong>Price:</strong> Rs. @book.Price
+                        </p>
+
+                        <form method="post"
+                              action="/Home/RemoveBook"
+                              onsubmit="return confirmRemove();"
+                              style="display:inline;">
+
+                            <input type="hidden"
+                                   name="id"
+                                   value="@book.Id" />
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm">
+                                Remove
+                            </button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@section Scripts
+{
+    <script>
+        function confirmRemove() 
+        {
+            return confirm("Are you sure you want to remove this book?");
+        }
+    </script>
+}
